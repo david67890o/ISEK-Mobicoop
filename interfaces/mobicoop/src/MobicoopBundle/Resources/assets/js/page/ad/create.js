@@ -15,19 +15,5 @@ Vue.use(Buefy);
 
 new Vue({
   el: '#app',
-  components: { Geocomplete, Datepicker, Timepicker, Vradio},
-  props: {
-    srole : {
-      type: Number,
-      default: null
-    },
-    sfrequency : {
-      type: Number,
-      default: null
-    },
-    stype : {
-      type: Number,
-      default: null
-    }
-  }
+  components: { Geocomplete, Datepicker, Timepicker, Vradio }
 })

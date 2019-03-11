@@ -1,53 +1,29 @@
 <template>
-    <b-radio 
-        :v-model="model"
-        :name="name"
-        :id="id"
-        :native-value="value"
-        :checked="checked"
-        >
-        {{ label }}
-    </b-radio>
+  <section>
+    <b-field>
+      <b-radio-button v-model="role" name="frequency" native-value="Conducteur" type="is-danger">
+        <b-icon icon="close"></b-icon>
+        <span>Conducteur</span>
+      </b-radio-button>
+      <b-radio-button v-model="role" name="role" native-value="Passager" type="is-success">
+        <b-icon icon="check"></b-icon>
+        <span>Passager</span>
+      </b-radio-button>
+      <b-radio-button v-model="role" name="role" native-value="both">Passager&Conducteur</b-radio-button>
+    </b-field>
+    <p class="content">
+      <b>Selection:</b>
+      {{ role }}
+    </p>
+  </section>
 </template>
 
 <script>
-    
-    const defaultString = {
-        type: String,
-        default: ''
-    }
-    const defaultBoolean = {
-        type: Boolean,
-        default: false
-    }
-    export default {
-        name: "vradio",
-        props: {
-            id: defaultString,
-            name: defaultString,
-            model: defaultString,
-            value: defaultString,
-            label: defaultString,
-            checked: defaultBoolean
-        },
-        data () {
-            console.log(this.model, this.checked, this.value)
-
-            return {
-                [this.model]: this.checked ? this.value.toString() : null
-            }
-        },
-        mounted() {
-            if (this.checked) this[this.model] = this.value.toString(); 
-        }
-        // methods: {
-        //     initialData(){
-        //         return {
-        //             model: '',
-        //             value: '',
-        //             label: ''
-        //         }
-        //     }
-        // }
-    }
+export default {
+  data() {
+    return {
+      role: ""
+    };
+  }
+};
 </script>
