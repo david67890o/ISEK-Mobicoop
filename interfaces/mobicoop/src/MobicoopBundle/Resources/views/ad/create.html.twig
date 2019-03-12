@@ -17,7 +17,7 @@
   </section>
   <section class="section">
     <div class="container">
-      <Vradio :frequency="'{{ frequency }}'" :role="'{{ role }}'"></Vradio>
+      <Vradio :frequency="'{{ form.frequency.vars.value }}'" :type="'{{ form.type.vars.value }}'" :role="'{{ form.role.vars.value }}'"></Vradio>
     </div>
   </section>
 {% endblock %}
