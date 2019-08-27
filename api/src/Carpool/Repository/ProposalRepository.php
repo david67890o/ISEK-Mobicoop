@@ -114,7 +114,7 @@ class ProposalRepository
         $zonePassengerWhere = '';
         if ($proposal->getCriteria()->isDriver()) {
             $zonesAsDriver =[];
-            if(!empty($proposal->getCriteria()->getDirectionDriver())) {
+            if (!empty($proposal->getCriteria()->getDirectionDriver())) {
                 $zonesAsDriver = $proposal->getCriteria()->getDirectionDriver()->getZones();
                 $zones = [];
                 foreach ($zonesAsDriver as $zone) {
@@ -124,13 +124,13 @@ class ProposalRepository
                 if (!empty($proposal->getCriteria()->getDirectionDriver())) {
                     $query->setParameter('thinnessPassenger', $this->getPrecision($proposal->getCriteria()->getDirectionDriver()));
                 } else {
-                    $query->setParameter('thinnessPassenger', NULL);
+                    $query->setParameter('thinnessPassenger', null);
                 }
             }
         }
         if ($proposal->getCriteria()->isPassenger()) {
             $zonesAsPassenger=[];
-            if(!empty($proposal->getCriteria()->getDirectionPassenger())) {
+            if (!empty($proposal->getCriteria()->getDirectionPassenger())) {
                 $zonesAsPassenger = $proposal->getCriteria()->getDirectionPassenger()->getZones();
                 $zones = [];
                 foreach ($zonesAsPassenger as $zone) {
@@ -140,21 +140,24 @@ class ProposalRepository
                 if (!empty($proposal->getCriteria()->getDirectionPassenger())) {
                     $query->setParameter('thinnessDriver', $this->getPrecision($proposal->getCriteria()->getDirectionPassenger()));
                 } else {
-                    $query->setParameter('thinnessDriver', NULL);
+                    $query->setParameter('thinnessDriver', null);
                 }
             }
         }
 
         // we search if the user can be passenger and/or driver
         if ($proposal->getCriteria()->isDriver() && $proposal->getCriteria()->isPassenger()) {
-            if(!empty($zoneDriverWhere) && !empty($zonePassengerWhere))
+            if (!empty($zoneDriverWhere) && !empty($zonePassengerWhere)) {
                 $query->andWhere('((c.driver = 1 and ' . $zoneDriverWhere . ') OR (c.passenger = 1 and ' . $zonePassengerWhere . '))');
+            }
         } elseif ($proposal->getCriteria()->isDriver()) {
-            if(!empty($zonePassengerWhere))
+            if (!empty($zonePassengerWhere)) {
                 $query->andWhere('(c.passenger = 1 and ' . $zonePassengerWhere . ')');
+            }
         } elseif ($proposal->getCriteria()->isPassenger()) {
-            if(!empty($zoneDriverWhere))
+            if (!empty($zoneDriverWhere)) {
                 $query->andWhere('(c.driver = 1 and ' . $zoneDriverWhere . ')');
+            }
         }
         
         // FREQUENCIES
@@ -613,15 +616,13 @@ class ProposalRepository
         
         }
 
-        if(!empty($punctualAndWhere) && empty($regularAndWhere)){
+        if (!empty($punctualAndWhere) && empty($regularAndWhere)) {
             $query->andWhere($punctualAndWhere);
             $query->setParameter('fromDate', $proposal->getCriteria()->getFromDate()->format('Y-m-d'));
-        }
-        else if(empty($punctualAndWhere) && !empty($regularAndWhere)){
+        } elseif (empty($punctualAndWhere) && !empty($regularAndWhere)) {
             $query->andWhere($regularAndWhere);
             $query->setParameter('fromDate', $proposal->getCriteria()->getFromDate()->format('Y-m-d'));
-        }
-        else if(!empty($punctualAndWhere) && !empty($regularAndWhere)){ 
+        } elseif (!empty($punctualAndWhere) && !empty($regularAndWhere)) {
             $query->andWhere('(' . $punctualAndWhere . ' or ' .$regularAndWhere . ')');
             $query->setParameter('fromDate', $proposal->getCriteria()->getFromDate()->format('Y-m-d'));
         }

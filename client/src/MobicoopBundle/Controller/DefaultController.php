@@ -71,10 +71,10 @@ class DefaultController extends AbstractController
     * Search page.
     * @Route("/addresses/search", name="api_geo_search")
     */
-     public function geoSearchAction(Request $request)
+    public function geoSearchAction(Request $request)
     {
         $client= new Client();
-        $gresponse= $client->request('GET', 'http://api.mobicoop.loc/addresses/search?q='.$request->get('q')  );
-         return new JsonResponse(json_decode($gresponse->getBody()));
+        $gresponse= $client->request('GET', 'http://api.mobicoop.loc/addresses/search?q='.$request->get('q'));
+        return new JsonResponse(json_decode($gresponse->getBody()));
     }
 }
