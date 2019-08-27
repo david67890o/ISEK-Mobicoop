@@ -29,6 +29,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\User\Service\UserManager;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use GuzzleHttp\Client;
 
 class DefaultController extends AbstractController
 {
@@ -62,5 +65,16 @@ class DefaultController extends AbstractController
             return $this->render('@Mobicoop/hydra/error.html.twig', ['hydra'=> $hydra]);
         }
         return null;
+    }
+
+    /**
+    * Search page.
+    * @Route("/addresses/search", name="api_geo_search")
+    */
+    public function geoSearchAction(Request $request)
+    {
+        $client= new Client();
+        $gresponse= $client->request('GET', 'http://api.mobicoop.loc/addresses/search?q='.$request->get('q'));
+        return new JsonResponse(json_decode($gresponse->getBody()));
     }
 }

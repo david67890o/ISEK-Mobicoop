@@ -79,7 +79,7 @@ class CarpoolController extends AbstractController
         //        ajout de la gestion des communautés
         $hydraCommunities = $communityManager->getCommunities();
         $communities =[];
-        if ($hydraCommunities && count($hydraCommunities->getMember())>0) {
+        if ($hydraCommunities && !empty($hydraCommunities->getMember()) && count($hydraCommunities->getMember())>0) {
             foreach ($hydraCommunities->getMember() as $value) {
                 foreach (array($value) as $community) {
                     if ($community->isSecured(true)) {
