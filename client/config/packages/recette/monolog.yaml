@@ -1,0 +1,30 @@
+monolog:
+     handlers:
+        main:
+            type:               fingers_crossed
+            action_level:       info
+            handler:            grouped
+        grouped:
+            type:               group
+            members:            [streamed, swift]
+        streamed:
+            type:               stream
+            path:               "%kernel.logs_dir%/%kernel.environment%.log"
+            level:              info
+        swift:
+            type:               swift_mailer
+            from_email:         '%env(MAIL_ERROR)%'
+            to_email:           '%env(MAIL_ERROR)%'
+            subject:    'An Error Occurred! %%message%%'
+            level:      error
+            formatter:  monolog.formatter.html
+            content_type: text/html
+        deprecation:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.deprecations.log"
+        deprecation_filter:
+            type: filter
+            handler: deprecation
+            max_level: info
+            channels: ["php"]
+
