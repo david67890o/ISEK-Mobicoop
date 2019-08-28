@@ -23,18 +23,29 @@
 
 namespace Mobicoop\Bundle\MobicoopBundle\Controller;
 
+use GuzzleHttp\Client;
+use Mobicoop\Bundle\MobicoopBundle\Api\Service\DataProvider;
+use Mobicoop\Bundle\MobicoopBundle\Carpool\Entity\Proposal;
+use Mobicoop\Bundle\MobicoopBundle\Filter\ExcelFilter;
 use Mobicoop\Bundle\MobicoopBundle\JsonLD\Entity\Hydra;
+use Mobicoop\Bundle\MobicoopBundle\Traits\HydraControllerTrait;
+use Mobicoop\Bundle\MobicoopBundle\User\Entity\User;
+use Mobicoop\Bundle\MobicoopBundle\User\Service\UserManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use App\User\Service\UserManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use GuzzleHttp\Client;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Reader\Xls;
 
 class DefaultController extends AbstractController
 {
+    use HydraControllerTrait;
+
     /**
      * HomePage
      * @Route("/", name="home")
@@ -76,5 +87,87 @@ class DefaultController extends AbstractController
         $client= new Client();
         $gresponse= $client->request('GET', 'http://api.mobicoop.loc/addresses/search?q='.$request->get('q'));
         return new JsonResponse(json_decode($gresponse->getBody()));
+    }
+
+    /**
+     * publie les annonces automatiquements.
+     * @Route("/annonces/publish", name="publish_annonce")
+     *
+     * @param ParameterBagInterface $params
+     * @param DataProvider $dataProvider
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     * @throws \ReflectionException
+     */
+    public function publishAnnonce(ParameterBagInterface $params, DataProvider $dataProvider)
+    {
+        $client= new Client();
+        $publicDirectory= $params->get('kernel.project_dir');
+        $chemin= $publicDirectory.'/src/MobicoopBundle/Resources/public/data/annonces.xls';
+        $cheminjson= $publicDirectory.'/src/MobicoopBundle/Resources/public/data/annonce.json.dist';
+        $json = json_decode(file_get_contents($cheminjson), true);
+        $dataProvider->setClass(User::class);
+        /** @var User[] $users */
+        $usersCollection=  $dataProvider->getCollection();
+        $users= $usersCollection->getValue()->getMember();
+        $reader = new Xls();
+        $reader->setReadDataOnly(true);
+        $reader->setLoadSheetsOnly(["annonces"]);
+        $reader->setReadFilter(new ExcelFilter());
+        $spreadsheet = $reader->load($chemin);
+        $datas=$spreadsheet->getActiveSheet()->toArray();
+        $title= array_shift($datas);
+        $userIndex=0;
+        $numUser= count($users);
+        $sprintDays= 12;
+        $startdate= date('Y-m-d');
+        $nextdate= strtotime($startdate);
+        $maxtimestring= ('+'.$sprintDays.' day');
+        $maxdate= strtotime($maxtimestring);
+        $proposals=[];
+        foreach ($datas as $loopIndex => $data) {
+            $date= date('Y-m-d', $nextdate).'T08:00:00.000Z';
+            $proposal= $json;
+            $proposal['type']=1;
+            $proposal['user']= '/users/'.$users[$userIndex]->getId();
+            $proposal['waypoints'][0]['address']['latitude']=$data[16];
+            $proposal['waypoints'][0]['address']['longitude']=$data[17];
+            $proposal['waypoints'][1]['address']['latitude']=$data[21];
+            $proposal['waypoints'][1]['address']['longitude']=$data[22];
+            $proposal['criteria']['driver']= ($data[23]!="Passager");
+            $proposal['criteria']['passenger']= ($data[23]=="Passager");
+            $proposal['criteria']['frequency']= (($data[6]=="Régulière")?10:1);
+            $proposal['criteria']['seats']= (($data[6]=="Régulière")?10:1);
+            $proposal['criteria']['fromDate']= $date;
+            $proposal['criteria']['fromTime']= $date;
+            $proposal['criteria']['minTime']= $date;
+            $proposal['criteria']['maxTime']= $date;
+            $proposal['criteria']['marginDuration']= 600;
+            $proposal['criteria']['strictDate']= true;
+            $proposal['criteria']['toDate']= $date;
+            $proposal['criteria']['anyRouteAsPassenger']= true;
+            $proposal['criteria']['multiTransportMode']= true;
+            $proposal['criteria']['priceKm']= rand(20, 50)."";
+            $proposals[]=$proposal;
+            $userIndex= ($userIndex+1)%$numUser;
+            $nextdate = strtotime('+1 day', $nextdate);
+            if ($nextdate > $maxdate) {
+                $nextDate = strtotime($startdate);
+            }
+        }
+        
+        $dataProvider->setClass(Proposal::class);
+        $databaseProposals= $dataProvider->getCollection()->getValue()->getMember();
+        /** @var Proposal $aproposal */
+        $aproposal= array_pop($databaseProposals);
+        $startCountProposal=$aproposal?$aproposal->getId():0;
+        foreach ($proposals as $proposal) {
+            $data= $dataProvider->postArray($proposal);
+            $reponseofmanager= $this->handleManagerReturnValue($data);
+            if (!empty($reponseofmanager)) {
+                return $reponseofmanager;
+            }
+        }
+        return new Response(202, "La création des annonces s'est bien déroulé, le jeu de données est prêt pour les tests");
     }
 }

@@ -140,6 +140,27 @@ class DataProvider
     }
 
     /**
+     * Post collection operation
+     *
+     * @param ResourceInterface $object An object representing the resource to post
+     *
+     * @return Response The response of the operation.
+     */
+    public function postArray(array $array): Response
+    {
+        try {
+            $clientResponse = $this->client->post($this->resource, [
+                'headers' => ['accept' => 'application/json'],
+                'json' => $array
+            ]);
+            $value = (string) $clientResponse->getBody();
+            return new Response($clientResponse->getStatusCode(), $value);
+        } catch (TransferException $e) {
+            return new Response($e->getCode(), self::treatHydraCollection($e->getResponse()->getBody()->getContents(), true));
+        }
+    }
+
+    /**
      * @param string        $class      The name of the class
      * @param string|null   $resource   The resource name if different than the pluralized class name
      * @throws \ReflectionException
