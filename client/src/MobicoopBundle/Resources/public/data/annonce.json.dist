@@ -1,0 +1,38 @@
+{
+  "type": 1,
+  "user": "/users/:user_id",
+  "waypoints": [
+    {
+      "position": 0,
+      "destination": false,
+      "address": {
+        "latitude": "48",
+        "longitude": "6.5"
+      }
+    },
+    {
+      "position": 1,
+      "destination": true,
+      "address": {
+        "latitude": "48.5",
+        "longitude": "7"
+      }
+    }
+  ],
+  "criteria": {
+    "driver": true,
+    "passenger": true,
+    "frequency": 1,
+    "seats": 2,
+    "fromDate": "",
+    "fromTime": "",
+    "minTime": "",
+    "maxTime": "",
+    "marginDuration": 600,
+    "strictDate": true,
+    "toDate": "",
+    "anyRouteAsPassenger": true,
+    "multiTransportMode": true,
+    "priceKm": "1"
+  }
+}
