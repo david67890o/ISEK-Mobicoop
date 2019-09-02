@@ -95,14 +95,18 @@ class ProposalMatcher
             $candidateProposal->setId($proposal->getUser()->getId());
         }
         $addresses = [];
+        /** @var Waypoint $waypoint */
         foreach ($proposal->getWaypoints() as $waypoint) {
             $addresses[] = $waypoint->getAddress();
         }
         $candidateProposal->setAddresses($addresses);
         if ($proposal->getCriteria()->isDriver()) {
-            $candidateProposal->setMaxDetourDistance($proposal->getCriteria()->getMaxDetourDistance() ? $proposal->getCriteria()->getMaxDetourDistance() : ($proposal->getCriteria()->getDirectionDriver()->getDistance()*self::MAX_DETOUR_DISTANCE_PERCENT/100));
-            $candidateProposal->setMaxDetourDuration($proposal->getCriteria()->getMaxDetourDuration() ? $proposal->getCriteria()->getMaxDetourDuration() : ($proposal->getCriteria()->getDirectionDriver()->getDuration()*self::MAX_DETOUR_DURATION_PERCENT/100));
+            if (!empty($proposal->getCriteria()->getDirectionDriver())) {
+                $candidateProposal->setMaxDetourDistance($proposal->getCriteria()->getMaxDetourDistance() ? $proposal->getCriteria()->getMaxDetourDistance() : ($proposal->getCriteria()->getDirectionDriver()->getDistance() * self::MAX_DETOUR_DISTANCE_PERCENT / 100));
+                $candidateProposal->setMaxDetourDuration($proposal->getCriteria()->getMaxDetourDuration() ? $proposal->getCriteria()->getMaxDetourDuration() : ($proposal->getCriteria()->getDirectionDriver()->getDuration() * self::MAX_DETOUR_DURATION_PERCENT / 100));
+            }
             $candidateProposal->setDirection($proposal->getCriteria()->getDirectionDriver());
+            /** @var Proposal $proposalToMatch */
             foreach ($proposalsFound as $proposalToMatch) {
                 // if the candidate is not passenger we skip (the 2 candidates could be driver AND passenger, and the second one match only as a driver)
                 if (!$proposalToMatch->getCriteria()->isPassenger()) {
@@ -117,8 +121,10 @@ class ProposalMatcher
                 $candidate->setAddresses($addressesCandidate);
                 $candidate->setDirection($proposalToMatch->getCriteria()->getDirectionPassenger());
                 // the 2 following are not taken in account right now as only the driver detour matters
-                $candidate->setMaxDetourDistance($proposalToMatch->getCriteria()->getMaxDetourDistance() ? $proposalToMatch->getCriteria()->getMaxDetourDistance() : ($proposalToMatch->getCriteria()->getDirectionPassenger()->getDistance()*self::MAX_DETOUR_DISTANCE_PERCENT/100));
-                $candidate->setMaxDetourDuration($proposalToMatch->getCriteria()->getMaxDetourDuration() ? $proposalToMatch->getCriteria()->getMaxDetourDuration() : ($proposalToMatch->getCriteria()->getDirectionPassenger()->getDuration()*self::MAX_DETOUR_DURATION_PERCENT/100));
+                if (!empty($proposal->getCriteria()->getDirectionPassenger())) {
+                    $candidate->setMaxDetourDistance($proposalToMatch->getCriteria()->getMaxDetourDistance() ? $proposalToMatch->getCriteria()->getMaxDetourDistance() : ($proposalToMatch->getCriteria()->getDirectionPassenger()->getDistance() * self::MAX_DETOUR_DISTANCE_PERCENT / 100));
+                    $candidate->setMaxDetourDuration($proposalToMatch->getCriteria()->getMaxDetourDuration() ? $proposalToMatch->getCriteria()->getMaxDetourDuration() : ($proposalToMatch->getCriteria()->getDirectionPassenger()->getDuration() * self::MAX_DETOUR_DURATION_PERCENT / 100));
+                }
                 if ($matches = $this->geoMatcher->singleMatch($candidateProposal, [$candidate], true)) {
                     // many matches can be found for 2 candidates : if multiple routes satisfy the criteria
                     if (is_array($matches) && count($matches)>0) {
@@ -137,8 +143,10 @@ class ProposalMatcher
         if ($proposal->getCriteria()->isPassenger()) {
             $candidateProposal->setDirection($proposal->getCriteria()->getDirectionPassenger());
             // the 2 following are not taken in account right now as only the driver detour matters
-            $candidateProposal->setMaxDetourDistance($proposal->getCriteria()->getMaxDetourDistance() ? $proposal->getCriteria()->getMaxDetourDistance() : ($proposal->getCriteria()->getDirectionPassenger()->getDistance()*self::MAX_DETOUR_DISTANCE_PERCENT/100));
-            $candidateProposal->setMaxDetourDuration($proposal->getCriteria()->getMaxDetourDuration() ? $proposal->getCriteria()->getMaxDetourDuration() : ($proposal->getCriteria()->getDirectionPassenger()->getDuration()*self::MAX_DETOUR_DURATION_PERCENT/100));
+            if (!empty($proposal->getCriteria()->getDirectionPassenger())) {
+                $candidateProposal->setMaxDetourDistance($proposal->getCriteria()->getMaxDetourDistance() ? $proposal->getCriteria()->getMaxDetourDistance() : ($proposal->getCriteria()->getDirectionPassenger()->getDistance() * self::MAX_DETOUR_DISTANCE_PERCENT / 100));
+                $candidateProposal->setMaxDetourDuration($proposal->getCriteria()->getMaxDetourDuration() ? $proposal->getCriteria()->getMaxDetourDuration() : ($proposal->getCriteria()->getDirectionPassenger()->getDuration() * self::MAX_DETOUR_DURATION_PERCENT / 100));
+            }
             foreach ($proposalsFound as $proposalToMatch) {
                 // if the candidate is not driver we skip (the 2 candidates could be driver AND passenger, and the second one match only as a passenger)
                 if (!$proposalToMatch->getCriteria()->isDriver()) {
@@ -152,8 +160,10 @@ class ProposalMatcher
                 }
                 $candidate->setAddresses($addressesCandidate);
                 $candidate->setDirection($proposalToMatch->getCriteria()->getDirectionDriver());
-                $candidate->setMaxDetourDistance($proposalToMatch->getCriteria()->getMaxDetourDistance() ? $proposalToMatch->getCriteria()->getMaxDetourDistance() : ($proposalToMatch->getCriteria()->getDirectionDriver()->getDistance()*self::MAX_DETOUR_DISTANCE_PERCENT/100));
-                $candidate->setMaxDetourDuration($proposalToMatch->getCriteria()->getMaxDetourDuration() ? $proposalToMatch->getCriteria()->getMaxDetourDuration() : ($proposalToMatch->getCriteria()->getDirectionDriver()->getDuration()*self::MAX_DETOUR_DURATION_PERCENT/100));
+                if (!empty($proposalToMatch->getCriteria()->getDirectionDriver())) {
+                    $candidate->setMaxDetourDistance($proposalToMatch->getCriteria()->getMaxDetourDistance() ? $proposalToMatch->getCriteria()->getMaxDetourDistance() : ($proposalToMatch->getCriteria()->getDirectionDriver()->getDistance() * self::MAX_DETOUR_DISTANCE_PERCENT / 100));
+                    $candidate->setMaxDetourDuration($proposalToMatch->getCriteria()->getMaxDetourDuration() ? $proposalToMatch->getCriteria()->getMaxDetourDuration() : ($proposalToMatch->getCriteria()->getDirectionDriver()->getDuration() * self::MAX_DETOUR_DURATION_PERCENT / 100));
+                }
                 if ($matches = $this->geoMatcher->singleMatch($candidateProposal, [$candidate], false)) {
                     // many matches can be found for 2 candidates : if multiple routes satisfy the criteria
                     if (is_array($matches) && count($matches)>0) {
@@ -324,7 +334,7 @@ class ProposalMatcher
      * Check that pickup times are valid against the given proposals.
      *
      * @param array $matchings  The candidates
-     * @return void
+     * @return Matching[]|null
      */
     private function checkPickUp(array $matchings)
     {

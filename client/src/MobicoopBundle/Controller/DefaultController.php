@@ -117,6 +117,7 @@ class DefaultController extends AbstractController
         $spreadsheet = $reader->load($chemin);
         $datas=$spreadsheet->getActiveSheet()->toArray();
         $title= array_shift($datas);
+        dump($title);
         $userIndex=0;
         $numUser= count($users);
         $sprintDays= 12;
@@ -132,8 +133,24 @@ class DefaultController extends AbstractController
             $proposal['user']= '/users/'.$users[$userIndex]->getId();
             $proposal['waypoints'][0]['address']['latitude']=$data[16];
             $proposal['waypoints'][0]['address']['longitude']=$data[17];
+            $proposal['waypoints'][0]['address']['street']=$data[1];
+            $proposal['waypoints'][0]['address']['streetAddress']=$data[1];
+            $proposal['waypoints'][0]['address']['postalCode']=$data[13];
+            $proposal['waypoints'][0]['address']['county']=$data[14];
+            $proposal['waypoints'][0]['address']['region']=$data[15];
+            $proposal['waypoints'][0]['address']['addressLocality']=$data[2];
+            $proposal['waypoints'][0]['address']['addressCountry']="France";
+            $proposal['waypoints'][0]['address']['countryCode']='33';
             $proposal['waypoints'][1]['address']['latitude']=$data[21];
             $proposal['waypoints'][1]['address']['longitude']=$data[22];
+            $proposal['waypoints'][1]['address']['street']=$data[3];
+            $proposal['waypoints'][1]['address']['streetAddress']=$data[3];
+            $proposal['waypoints'][1]['address']['postalCode']=$data[18];
+            $proposal['waypoints'][1]['address']['county']=$data[19];
+            $proposal['waypoints'][1]['address']['region']=$data[20];
+            $proposal['waypoints'][1]['address']['addressLocality']=$data[4];
+            $proposal['waypoints'][1]['address']['addressCountry']="France";
+            $proposal['waypoints'][1]['address']['countryCode']='33';
             $proposal['criteria']['driver']= ($data[23]!="Passager");
             $proposal['criteria']['passenger']= ($data[23]=="Passager");
             $proposal['criteria']['frequency']= (($data[6]=="Régulière")?10:1);
@@ -149,13 +166,17 @@ class DefaultController extends AbstractController
             $proposal['criteria']['multiTransportMode']= true;
             $proposal['criteria']['priceKm']= rand(20, 50)."";
             $proposals[]=$proposal;
+            unset($proposal);
             $userIndex= ($userIndex+1)%$numUser;
             $nextdate = strtotime('+1 day', $nextdate);
             if ($nextdate > $maxdate) {
                 $nextDate = strtotime($startdate);
             }
         }
-        
+//        dump($proposals);
+//        dump($json);
+//        dump($datas);
+//        exit();
         $dataProvider->setClass(Proposal::class);
         $databaseProposals= $dataProvider->getCollection()->getValue()->getMember();
         /** @var Proposal $aproposal */
