@@ -151,4 +151,9 @@ class CommunityManager
         }
         return false;
     }
+
+    public function getStatistics(Community $data)
+    {
+        return [5,5,5,5,5];
+    }
 }

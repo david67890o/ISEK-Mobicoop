@@ -114,4 +114,16 @@ class CommunityManager
         }
         return null;
     }
+
+    public function getStatistics(Community $community)
+    {
+        $this->dataProvider->setClass(Community::class);
+        $response = $this->dataProvider->getSpecialItem($community->getId(), 'statistics');
+        dump($response);
+        exit();
+        if ($response->getCode() == 201) {
+            return $response->getValue();
+        }
+        return null;
+    }
 }

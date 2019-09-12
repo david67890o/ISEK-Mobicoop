@@ -121,13 +121,16 @@ class CommunityController extends AbstractController
             }
             $errorLoginSecured = "La connexion a échoué";
         }
+        dump($communityManager->getStatistics($community));
+        exit();
         return $this->render('@Mobicoop/community/showCommunity.html.twig', [
             'community' => $community,
             'formIdentification' => $form->createView(),
             'communityUser' => $communityUser,
             'user' => $user,
             'errorLoginSecured' => $errorLoginSecured,
-            'isMember' => $isMember
+            'isMember' => $isMember,
+            'statistics'=> $communityManager->getStatistics($community)
         ]);
     }
 

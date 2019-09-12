@@ -43,7 +43,9 @@
                 :geodata="{{ {'geocompleteuri':geoCompleteUri,  'searchroute':searchRoute}|json_encode }}"
                 :user="{{app.user|json_encode}}"
                 :sign-up-users= "{{ lastusers|json_encode }}"
-        ></community-display>
+                :stat-datas="{{ statistics |json_encode }}"
+        >
+        </community-display>
         </section>
         <br/><br/>
     </div>

@@ -38,7 +38,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Carpool\Entity\Proposal;
-use App\Community\Controller\JoinAction;
+use App\Community\Controller\CommunityStats;
 
 /**
  * A community : a group of users sharing common interests.
@@ -73,7 +73,16 @@ use App\Community\Controller\JoinAction;
  *              }
  *          }
  *      },
- *      itemOperations={"get","put","delete"}
+ *      itemOperations={
+ *        "get",
+ *        "put",
+ *        "delete",
+ *        "statistics"={
+ *              "method"="GET",
+ *              "path"="/communities/{id}/statistics",
+ *              "controller"=CommunityStats::class,
+ *         },
+ *     }
  * )
  * @ApiFilter(OrderFilter::class, properties={"id", "name", "description", "createdDate"}, arguments={"orderParameterName"="order"})
  * @ApiFilter(SearchFilter::class, properties={"name":"partial"})

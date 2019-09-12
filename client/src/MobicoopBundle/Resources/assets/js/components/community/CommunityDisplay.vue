@@ -267,6 +267,12 @@ export default {
       default: function(){
         return [{avatar: '_', name: 'Ngouffo Doric', acceptedDate: '12/01/2019'}]
       }
+    },
+    statDatas:{
+      type: Array,
+      default: function () {
+        return [1,1,1,1,1];
+      }
     }
   },
   data () {
@@ -312,7 +318,18 @@ export default {
         : moment(new Date()).format(this.$t("ui.i18n.date.format.fullNumericDate"));
     }
   },
+  created:function(){
+    this.initialize();
+  },
+  updated:function(){
+    this.initialize();
+  },
   methods:{
+    initialize:function(){
+      this.statDatas.forEach((value, index) => {
+        this.statistics[index].number = value;
+      });
+    },
     linkToCommunityJoin: function (item) {
       return '/join-community/'+item.id;
     },

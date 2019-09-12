@@ -217,9 +217,11 @@ class DataProvider
     public function getSpecialItem(int $id, string $operation, array $params=null): Response
     {
         try {
+            dump($this->resource."/".$id.'/'.$operation, ['query'=>$params, 'headers' => ['accept' => 'application/json']]);
             if ($this->format == self::RETURN_ARRAY) {
                 $clientResponse = $this->client->get($this->resource."/".$id.'/'.$operation, ['query'=>$params]);
                 $value = json_decode((string) $clientResponse->getBody(), true);
+                dump($clientResponse);
             } elseif ($this->format == self::RETURN_JSON) {
                 $clientResponse = $this->client->get($this->resource."/".$id.'/'.$operation, ['query'=>$params, 'headers' => ['accept' => 'application/json']]);
                 $value = (string) $clientResponse->getBody();
