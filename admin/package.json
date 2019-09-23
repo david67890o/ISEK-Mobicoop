@@ -13,6 +13,7 @@
     "ra-input-rich-text": "^2.8.6",
     "ra-language-french": "^2.8.5",
     "react": "^16.3.0",
+    "react-autocomplete": "^1.8.1",
     "react-dom": "^16.3.0",
     "react-scripts": "^2.1.1"
   },

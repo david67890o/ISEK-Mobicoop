@@ -5,11 +5,12 @@ import {
     Create, Edit, List, Show,
     TabbedForm, FormTab,
     TabbedShowLayout, Tab,
+    Link,
     Datagrid,
     TextInput, DisabledInput, SelectInput, DateInput, ReferenceInput, BooleanInput,
     email,
-    TextField, EmailField, DateField, 
-    ShowButton, EditButton,
+    TextField, EmailField, DateField, ReferenceArrayField, BooleanField, FunctionField,
+    Button, ShowButton, EditButton, DeleteButton,
     Filter
 } from 'react-admin';
 
@@ -68,7 +69,7 @@ export const UserShow = (props) => (
 
             </Tab>
             <Tab label="Adresses">
-
+            
             </Tab>
         </TabbedShowLayout>
     </Show>
@@ -100,6 +101,17 @@ export const UserCreate = (props) => (
 );
 
 // Edit
+const AddNewAddressButton = ({ record }) => (
+    <Button
+        component={Link}
+        to={{
+            pathname: `/addresses/create`,
+            search: `?user=${record.id}`
+        }}
+        label="Ajouter une adresse"
+    >
+    </Button>
+);
 export const UserEdit = (props) => (
     <Edit {...props} title="Utilisateurs > éditer">
         <TabbedForm>
@@ -116,7 +128,19 @@ export const UserEdit = (props) => (
 
             </FormTab>
             <FormTab label="Adresses">
-
+                <ReferenceArrayField source="addresses" reference="addresses" addLabel={false}>
+                    <Datagrid>
+                        <BooleanField source="home" label="Domicile" />
+                        <TextField source="name" label="Nom" />
+                        <FunctionField label="Address" render={address => ((address.houseNumber && address.street) ? (address.houseNumber+ ' '+address.street) : address.streetAddress)} />
+                        <TextField source="postalCode" label="Code postal" />
+                        <TextField source="addressLocality" label="Ville" />
+                        <TextField source="addressCountry" label="Pays" />
+                        <EditButton />
+                        <DeleteButton />
+                    </Datagrid>
+                </ReferenceArrayField>
+                <AddNewAddressButton />
             </FormTab>
         </TabbedForm>
     </Edit>
