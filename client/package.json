@@ -70,7 +70,7 @@
     "lodash": "^4.17.11",
     "material-design-icons-iconfont": "^5.0.1",
     "moment": "^2.24.0",
-    "node-sass": "^4.12.0",
+    "node-sass": "^7.0.0",
     "remove": "^0.1.5",
     "request": "^2.88.0",
     "stylelint": "^9.10.1",
